@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HubMinimalWp</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1b1f24;
+      --line: #e5e7eb;
+      --accent: #2563eb;
+      --ok: #16a34a;
+      --warn: #d97706;
+      --bad: #dc2626;
+      --muted: #6b7280;
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --sidebar-w: 240px;
+      --topbar-h: 52px;
+    }
+    * { border-radius: 0 !important; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-w);
+      background: var(--card);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      z-index: 1030;
+    }
+    .sidebar-brand {
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      padding: 0 1.1rem;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      font-size: 1.05rem;
+    }
+    .sidebar-brand span { color: var(--accent); }
+    .sidebar-nav {
+      flex: 1;
+      padding: .75rem .6rem;
+      overflow-y: auto;
+    }
+    .nav-label {
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 700;
+      padding: .75rem .65rem .35rem;
+    }
+    .side-link {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink);
+      font-size: .875rem;
+      font-weight: 600;
+      padding: .55rem .65rem;
+      text-decoration: none;
+      margin-bottom: 2px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .side-link:hover { background: var(--bg); }
+    .side-link.active {
+      background: #eff6ff;
+      color: var(--accent);
+      border-color: #dbeafe;
+    }
+    .side-link .ico { width: 1.1rem; text-align: center; opacity: .75; }
+    .sidebar-foot {
+      border-top: 1px solid var(--line);
+      padding: .85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+    .sidebar-foot .badge { align-self: flex-start; }
+
+    /* Topbar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 0 1.25rem;
+      z-index: 1020;
+      gap: .75rem;
+    }
+    .topbar h1 {
+      font-size: .95rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .topbar .spacer { flex: 1; }
+
+    /* Main */
+    .main {
+      position: fixed;
+      top: var(--topbar-h);
+      left: var(--sidebar-w);
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+      padding: 1.25rem;
+    }
+
+    .card { background: var(--card); border: 1px solid var(--line); box-shadow: none; }
+    .card-header { background: transparent; border-bottom: 1px solid var(--line); font-weight: 600; padding: .85rem 1rem; }
+    .btn { font-weight: 600; font-size: .875rem; padding: .45rem .9rem; border-width: 1px; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+    .btn-outline-secondary { background: #fff; color: var(--ink); border-color: var(--line); }
+    .btn-outline-secondary:hover { background: var(--bg); color: var(--ink); border-color: #d1d5db; }
+    .btn-outline-danger { background: #fff; color: var(--bad); border-color: #fecaca; }
+    .btn-outline-danger:hover { background: #fef2f2; color: var(--bad); border-color: var(--bad); }
+    .btn-outline-primary { background: #fff; color: var(--accent); border-color: #bfdbfe; }
+    .btn-outline-primary:hover { background: #eff6ff; color: var(--accent); border-color: var(--accent); }
+    .form-control, .form-select { border-color: var(--line); background: #fff; font-size: .925rem; }
+    .form-control:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+    .form-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; margin-bottom: .35rem; }
+    .badge { font-weight: 600; font-size: .72rem; padding: .35em .6em; border: 1px solid transparent; }
+    .badge-ok { background: #f0fdf4; color: var(--ok); border-color: #bbf7d0; }
+    .badge-qr { background: #eff6ff; color: var(--accent); border-color: #bfdbfe; }
+    .badge-conn { background: #fffbeb; color: var(--warn); border-color: #fde68a; }
+    .badge-empty { background: var(--bg); color: var(--muted); border-color: var(--line); }
+    .badge-bad { background: #fef2f2; color: var(--bad); border-color: #fecaca; }
+    .slot-title { font-size: .95rem; font-weight: 700; margin: 0; }
+    .qr-box { display: flex; align-items: center; justify-content: center; min-height: 220px; background: var(--bg); border: 1px dashed var(--line); }
+    .qr-box img { width: 200px; height: 200px; image-rendering: pixelated; background: #fff; }
+    .qr-placeholder { color: var(--muted); font-size: .85rem; text-align: center; padding: 1rem; }
+    .section-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin-bottom: .75rem; }
+    .phone { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; }
+    pre.api { background: var(--card); border: 1px solid var(--line); padding: 1rem; font-size: .78rem; margin: 0; white-space: pre-wrap; }
+    .toast-body { font-size: .875rem; }
+    .divider { height: 1px; background: var(--line); margin: 1.25rem 0; }
+    .text-muted-2 { color: var(--muted); }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-head { margin-bottom: 1rem; }
+    .page-head h2 { font-size: 1.15rem; font-weight: 700; margin: 0; }
+    .page-head p { margin: .2rem 0 0; color: var(--muted); font-size: .875rem; }
+
+    .menu-toggle { display: none; }
+
+    @media (max-width: 991.98px) {
+      .sidebar { transform: translateX(-100%); transition: transform .2s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .topbar, .main { left: 0; }
+      .menu-toggle { display: inline-flex; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">Hub<span>MinimalWp</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Menü</div>
+      <button class="side-link active" data-page="sessions"><span class="ico">▦</span> Oturumlar</button>
+      <button class="side-link" data-page="send"><span class="ico">→</span> Mesaj Gönder</button>
+      <button class="side-link" data-page="bulk"><span class="ico">≡</span> Toplu Gönder</button>
+      <div class="nav-label">Dokümantasyon</div>
+      <button class="side-link" data-page="api"><span class="ico">{ }</span> API Referans</button>
+      <button class="side-link" data-page="portainer"><span class="ico">▣</span> Portainer</button>
+    </nav>
+    <div class="sidebar-foot">
+      <span class="badge badge-empty" id="health">kontrol…</span>
+      <span class="badge badge-empty">max 3 numara</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="btn btn-outline-secondary menu-toggle" id="menuToggle" type="button">☰</button>
+    <h1 id="topTitle">Oturumlar</h1>
+    <div class="spacer"></div>
+    <span class="badge badge-empty">HubMinimalWp</span>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- OTURUMLAR -->
+    <section class="page active" id="page-sessions">
+      <div class="page-head">
+        <h2>Oturumlar</h2>
+        <p>En fazla 3 numara. QR ile bağlayın, çıkışta slotu silin.</p>
+      </div>
+      <div id="sessions" class="row g-3"></div>
+    </section>
+
+    <!-- MESAJ -->
+    <section class="page" id="page-send">
+      <div class="page-head">
+        <h2>Mesaj Gönder</h2>
+        <p>Tek numara veya grup ID'ye metin / medya gönderin.</p>
+      </div>
+      <div class="card" style="max-width: 720px;">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Slot</label>
+              <select id="f-slot" class="form-select">
+                <option value="1">Slot 1</option>
+                <option value="2">Slot 2</option>
+                <option value="3">Slot 3</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Numara / Grup ID</label>
+              <input id="f-number" class="form-control" placeholder="05xx… veya 905… yada grup id" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tip</label>
+              <select id="f-type" class="form-select">
+                <option value="text">Metin</option>
+                <option value="media">Medya (URL)</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Mesaj / URL</label>
+              <textarea id="f-text" class="form-control" rows="4" placeholder="Mesaj yazın veya medya URL…"></textarea>
+            </div>
+            <div class="col-12 d-flex align-items-center gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="f-group" />
+                <label class="form-check-label" for="f-group">Gruba gönder</label>
+              </div>
+              <button class="btn btn-primary ms-auto" id="btn-send">Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BULK -->
+    <section class="page" id="page-bulk">
+      <div class="page-head">
+        <h2>Toplu Gönder</h2>
+        <p>Virgülle ayırılmış numaralara aynı metni gönderir.</p>
+      </div>
+      <div class="card" style="max-width: 720px;">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Slot</label>
+              <select id="b-slot" class="form-select">
+                <option value="1">Slot 1</option>
+                <option value="2">Slot 2</option>
+                <option value="3">Slot 3</option>
+              </select>
+            </div>
+            <div class="col-md-9">
+              <label class="form-label">Numaralar (virgülle)</label>
+              <input id="b-numbers" class="form-control" placeholder="905xx,905xx,905xx" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Mesaj</label>
+              <textarea id="b-text" class="form-control" rows="3" placeholder="Ortak mesaj…"></textarea>
+            </div>
+            <div class="col-12 d-flex">
+              <button class="btn btn-outline-primary ms-auto" id="btn-bulk">Toplu Gönder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- API -->
+    <section class="page" id="page-api">
+      <div class="page-head">
+        <h2>API Referans</h2>
+        <p>Tüm endpointler JSON döner: <code>{ ok: true|false }</code></p>
+      </div>
+      <div class="card" style="max-width: 760px;">
+        <div class="card-header">Endpointler</div>
+        <div class="card-body">
+          <pre class="api">GET    /api/health
+GET    /api/sessions
+POST   /api/sessions/:slot/start
+GET    /api/sessions/:slot/status
+DELETE /api/sessions/:slot
+
+POST   /api/send
+{
+  "slot": 1,
+  "number": "905xxxxxxxxx",
+  "text": "merhaba"
+}
+
+POST   /api/send/bulk
+{
+  "slot": 1,
+  "numbers": ["905xx","905xx"],
+  "text": "merhaba"
+}
+
+POST   /api/send/media
+{
+  "slot": 1,
+  "number": "905xx",
+  "url": "https://…/photo.jpg",
+  "caption": "selam"
+}
+
+# opsiyonel auth header:
+X-API-Key: (API_KEY)</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTAINER -->
+    <section class="page" id="page-portainer">
+      <div class="page-head">
+        <h2>Portainer / Traefik</h2>
+        <p>GitHub'dan Portainer stack → https://hubmsg.octotech.az (edge + traefik)</p>
+      </div>
+      <div class="card" style="max-width: 760px;">
+        <div class="card-header">Deploy</div>
+        <div class="card-body">
+          <pre class="api"># Portainer → Stacks → Add → Repository
+# Web URL:  https://github.com/&lt;user&gt;/&lt;repo&gt;
+# Compose path: docker-compose.yml
+# Stack name:   hubminimalwp
+#
+# Ön koşullar (sunucuda hazır olmalı):
+#   - external network: edge
+#   - traefik (entrypoint: web)
+#   - /datastore/hubminimal/data
+#
+# Cloudflare DNS:
+#   hubmsg.octotech.az → sunucu IP (A/AAAA)
+#
+# Deploy → https://hubmsg.octotech.az</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="toast-body">—</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id)
+    const apiKey = localStorage.getItem('apiKey') || ''
+    const toast = new bootstrap.Toast($('toast'), { delay: 3500 })
+
+    const titles = {
+      sessions: 'Oturumlar',
+      send: 'Mesaj Gönder',
+      bulk: 'Toplu Gönder',
+      api: 'API Referans',
+      portainer: 'Portainer / Traefik'
+    }
+
+    document.querySelectorAll('.side-link').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.side-link').forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+        const page = btn.dataset.page
+        document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'))
+        $('page-' + page).classList.add('active')
+        $('topTitle').textContent = titles[page] || page
+        $('sidebar').classList.remove('open')
+      })
+    })
+
+    $('menuToggle').onclick = () => $('sidebar').classList.toggle('open')
+
+    function notify(msg, ok = true) {
+      $('toast-body').textContent = msg
+      $('toast').classList.toggle('bg-success', ok)
+      $('toast').classList.toggle('bg-danger', !ok)
+      toast.show()
+    }
+
+    async function api(path, opts = {}) {
+      const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+      if (apiKey) headers['X-API-Key'] = apiKey
+      const res = await fetch(path, { ...opts, headers })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || res.statusText)
+      return data
+    }
+
+    function badge(status) {
+      const map = {
+        connected: ['badge-ok', 'BAĞLI'],
+        qr: ['badge-qr', 'QR HAZIR'],
+        connecting: ['badge-conn', 'BAĞLANIYOR'],
+        empty: ['badge-empty', 'BOŞ'],
+        error: ['badge-bad', 'HATA']
+      }
+      const [cls, label] = map[status] || ['badge-empty', status]
+      return `<span class="badge ${cls}">${label}</span>`
+    }
+
+    function renderSessions(list) {
+      const wrap = $('sessions')
+      wrap.innerHTML = list.map((s) => `
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="slot-title">Slot ${s.slot}</h5>
+                ${badge(s.status)}
+              </div>
+              <div class="phone text-muted-2 mb-3">${s.phone || (s.status === 'connected' ? s.jid : '—')}</div>
+              <div class="qr-box mb-3" id="qr-${s.slot}">
+                <div class="qr-placeholder">QR yok<br/>oturum başlatın</div>
+              </div>
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary" onclick="startSlot(${s.slot})" ${s.status === 'connected' ? 'disabled' : ''}>
+                  ${s.status === 'connected' ? 'Bağlı' : 'QR Başlat'}
+                </button>
+                <button class="btn btn-outline-danger" onclick="deleteSlot(${s.slot})">Çıkış / Sil</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    async function refresh() {
+      try {
+        const h = await api('/api/health')
+        $('health').textContent = `API OK · max ${h.maxSlots}`
+        const data = await api('/api/sessions')
+        renderSessions(data.sessions)
+        for (const s of data.sessions) {
+          if (s.status === 'qr' || s.status === 'connected' || s.status === 'connecting') {
+            const st = await api(`/api/sessions/${s.slot}/status`)
+            const box = $('qr-' + s.slot)
+            if (!box) continue
+            if (st.qr) box.innerHTML = `<img src="${st.qr}" alt="QR" />`
+            else if (st.status === 'connected') box.innerHTML = `<div class="qr-placeholder">✓ bağlı<br/><b>${st.phone || ''}</b></div>`
+            else box.innerHTML = `<div class="qr-placeholder">QR bekleniyor…</div>`
+          }
+        }
+      } catch (e) {
+        $('health').textContent = 'API HATA'
+      }
+    }
+
+    async function startSlot(slot) {
+      try {
+        notify(`Slot ${slot} başlatılıyor…`)
+        await api(`/api/sessions/${slot}/start`, { method: 'POST' })
+        refresh()
+      } catch (e) { notify(e.message, false) }
+    }
+
+    async function deleteSlot(slot) {
+      if (!confirm(`Slot ${slot} silinsin mi?`)) return
+      try {
+        await api(`/api/sessions/${slot}`, { method: 'DELETE' })
+        notify(`Slot ${slot} silindi`)
+        refresh()
+      } catch (e) { notify(e.message, false) }
+    }
+
+    $('btn-send').onclick = async () => {
+      try {
+        const slot = Number($('f-slot').value)
+        const number = $('f-number').value.trim()
+        const type = $('f-type').value
+        const text = $('f-text').value.trim()
+        const group = $('f-group').checked
+        if (!number) return notify('Numara girin', false)
+        if (type === 'text') {
+          if (!text) return notify('Mesaj girin', false)
+          const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ slot, number, text, group }) })
+          notify('Gönderildi: ' + (r.id || 'ok'))
+        } else {
+          if (!text) return notify('Medya URL girin', false)
+          const r = await api('/api/send/media', { method: 'POST', body: JSON.stringify({ slot, number, url: text, group }) })
+          notify('Medya gönderildi: ' + (r.id || 'ok'))
+        }
+      } catch (e) { notify(e.message, false) }
+    }
+
+    $('btn-bulk').onclick = async () => {
+      try {
+        const slot = Number($('b-slot').value)
+        const numbers = $('b-numbers').value.split(',').map((x) => x.trim()).filter(Boolean)
+        const text = $('b-text').value.trim()
+        if (!numbers.length || !text) return notify('Numara ve mesaj girin', false)
+        const r = await api('/api/send/bulk', { method: 'POST', body: JSON.stringify({ slot, numbers, text }) })
+        notify(`${r.count} numaraya gönderildi`)
+      } catch (e) { notify(e.message, false) }
+    }
+
+    refresh()
+    setInterval(refresh, 3000)
+  </script>
+</body>
+</html>

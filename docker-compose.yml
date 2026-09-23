@@ -1,0 +1,23 @@
+services:
+  hubminimalwp:
+    image: hubminimalwp:latest
+    build: .
+    container_name: HubMinimalWp
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      API_KEY: ${API_KEY:-}
+    volumes:
+      - /datastore/hubminimal/data:/app/data
+    networks:
+      - edge
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=edge'
+      - 'traefik.http.routers.hubmsg.rule=Host(`hubmsg.octotech.az`)'
+      - 'traefik.http.routers.hubmsg.entrypoints=web'
+      - 'traefik.http.services.hubmsg.loadbalancer.server.port=3000'
+
+networks:
+  edge:
+    external: true
