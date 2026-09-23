@@ -342,7 +342,7 @@ X-API-Key: (API_KEY)</pre>
         <div class="card-header">Deploy</div>
         <div class="card-body">
           <pre class="api"># Portainer → Stacks → Add → Repository
-# Web URL:  https://github.com/&lt;user&gt;/&lt;repo&gt;
+# Web URL:  https://github.com/aliyabuz25/HubMSG-Mini.git
 # Compose path: docker-compose.yml
 # Stack name:   hubminimalwp
 #
@@ -351,10 +351,16 @@ X-API-Key: (API_KEY)</pre>
 #   - traefik (entrypoint: web) — aynı edge ağında
 #   - /datastore/hubminimal/data
 #
-# Cloudflare DNS:
-#   hubmsg.octotech.az → sunucu IP (A/AAAA)
+# Cloudflare DNS (error 1033 ise):
+#   Tunnel CNAME kaydını sil
+#   → proxied A: hubmsg → sunucu IP
 #
-# Deploy → https://hubmsg.octotech.az</pre>
+# Alternatif tunnel:
+#   Zero Trust → hostname hubmsg → http://hubminimalwp:3000
+#   + TUNNEL_TOKEN + compose --profile tunnel
+#
+# Deploy → https://hubmsg.octotech.az
+# Test:   /api/health → {"ok":true}</pre>
         </div>
       </div>
     </section>

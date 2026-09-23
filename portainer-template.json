@@ -3,7 +3,7 @@
   "templates": [
     {
       "title": "HubMinimalWp",
-      "description": "WhatsApp hub - 3 numara, QR, mesaj API",
+      "description": "WhatsApp hub - 3 numara, QR, mesaj API → hubmsg.octotech.az",
       "platform": "docker",
       "image": "hubminimalwp:latest",
       "build": ".",
@@ -13,6 +13,11 @@
         {
           "name": "API_KEY",
           "label": "API Key (optional)",
+          "default": ""
+        },
+        {
+          "name": "TUNNEL_TOKEN",
+          "label": "Cloudflare Tunnel Token (optional)",
           "default": ""
         }
       ],

@@ -16,9 +16,26 @@ services:
       - 'traefik.docker.network=edge'
       - 'traefik.http.routers.hubmsg.rule=Host(`hubmsg.octotech.az`)'
       - 'traefik.http.routers.hubmsg.entrypoints=web'
+      - 'traefik.http.routers.hubmsg.priority=100'
       - 'traefik.http.services.hubmsg.loadbalancer.server.port=3000'
 
-# Yoksa oluşturur; varsa mevcut edge ağına bağlanır
+  # Opsiyonel: Cloudflare Tunnel (Traefik yerine veya yanında)
+  # cloudflared profile ile: docker compose --profile tunnel up -d
+  # TUNNEL_TOKEN gerekir; Zero Trust → hubmsg.octotech.az → http://hubminimalwp:3000
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: hubmsg-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    networks:
+      - edge
+    depends_on:
+      - hubminimalwp
+    profiles:
+      - tunnel
+
 networks:
   edge:
     name: edge
