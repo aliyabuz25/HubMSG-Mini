@@ -1,8 +1,8 @@
 # HubMinimalWp
 
-Minimal WhatsApp hub — Baileys + Bootstrap admin panel. En fazla **3 numara**, QR ile bağlanma, mesaj gönderme API'leri. Portainer / Traefik için hazır.
+Minimal WhatsApp hub — Baileys + Bootstrap admin panel. En fazla **3 numara**, QR ile bağlanma, mesaj gönderme API'leri. Portainer / Traefik (443) için hazır.
 
-**Domain:** https://hubmsg.octotech.az
+**Domain:** https://wa.octotech.az
 
 ## Özellikler
 
@@ -10,7 +10,7 @@ Minimal WhatsApp hub — Baileys + Bootstrap admin panel. En fazla **3 numara**,
 - QR ile oturum ekleme / silme
 - Metin, medya (URL) ve toplu gönderim
 - Light flat Bootstrap UI + sidebar
-- Traefik `edge` network etiketleri (`Host(hubmsg.octotech.az)`)
+- Traefik `edge` network + **websecure :443** (`Host(wa.octotech.az)`)
 - Opsiyonel `API_KEY` koruması
 - Opsiyonel Cloudflare Tunnel (`--profile tunnel`)
 
@@ -38,83 +38,66 @@ npm start
 ### Örnekler
 
 ```bash
-# QR başlat
 curl -X POST http://localhost:3000/api/sessions/1/start
 
-# Mesaj gönder
 curl -X POST http://localhost:3000/api/send \
   -H 'Content-Type: application/json' \
   -d '{"slot":1,"number":"905xxxxxxxxx","text":"merhaba"}'
 
-# Toplu
 curl -X POST http://localhost:3000/api/send/bulk \
   -H 'Content-Type: application/json' \
   -d '{"slot":1,"numbers":["905xx","905xx"],"text":"selam"}'
 
-# Medya
 curl -X POST http://localhost:3000/api/send/media \
   -H 'Content-Type: application/json' \
   -d '{"slot":1,"number":"905xx","url":"https://…/photo.jpg","caption":"selam"}'
 ```
 
-Production: `https://hubmsg.octotech.az/api/health`  
+Production: `https://wa.octotech.az/api/health`  
 `API_KEY` tanımlıysa header: `X-API-Key: <key>`
 
 ## Cloudflare DNS (error 1033)
 
-**Belirti:** Portainer log’u `HubMinimalWp hazır: http://0.0.0.0:3000` ama tarayıcıda **Error 1033 / Cloudflare Tunnel error**.
+**Belirti:** Portainer log’u `HubMinimalWp hazır` ama tarayıcıda **Error 1033** → kayıt Tunnel’da; edge hostname’i çözemiyor.
 
-Uygulama ve Traefik doğru; kayıt **Cloudflare Tunnel (CNAME)** — edge, hostname’i bu tunnel’da çözemediğinden 1033 döner.
+### Traefik 443 (önerilen)
 
-### Seçenek A — Traefik (eventrentlast gibi, önerilen)
-
-1. Cloudflare → **DNS** → `hubmsg` kaydını **Delete**
+1. Cloudflare → DNS → eski `hubmsg` / `wa` Tunnel kaydını **sil/değiştir**
 2. **Add record:**
    - Type: **A**
-   - Name: **hubmsg**
-   - IPv4: **sunucu public IP** (Portainer/Traefik’in olduğu makine)
-   - Proxy: **DNS only (gri bulut)** dene; olmazsa **Proxied (turuncu)**
-3. 1–2 dk bekle → `https://hubmsg.octotech.az/api/health`
+   - Name: **wa**
+   - IPv4: **sunucu public IP** (Traefik :443)
+   - Proxy: **Proxied (turuncu)** — origin TLS Full (strict) ise; Flexible ise gri de olur
+3. Traefik’te `websecure` (443) açık ve TLS resolver/cert tanımlı olmalı
+4. Test: `https://wa.octotech.az/api/health` → `{"ok":true,"maxSlots":3}`
 
-> Compose zaten `Host(hubmsg.octotech.az)` + `entrypoints=web` tanımlı (commit `0ca1957`). Origin’e giden tek eksik DNS.
+Eski `hubmsg.octotech.az` kullanıyorsan aynı adımlar: A kaydı `hubmsg` → sunucu IP.
 
-### Seçenek B — Cloudflare Tunnel
+### Alternatif: Cloudflare Tunnel
 
-1. Zero Trust → **Networks → Tunnels** → aktif tunnel → **Public Hostname → Add**
-   - `hubmsg.octotech.az` → `http://hubminimalwp:3000`  
-     (hubminimalwp compose ile aynı `edge` ağında olmalı)
-2. Stack env: `TUNNEL_TOKEN=<tunnel token>`
-3. Deploy: `docker compose --profile tunnel up -d`  
-   veya Portainer’da stack’i bu profile ile başlat
-4. DNS: `hubmsg` tunnel CNAME kaydı kalsın
-
-### Doğrulama
-
-```bash
-curl -s https://hubmsg.octotech.az/api/health
-# {"ok":true,"maxSlots":3}
-```
-
-1033 sürerse: tunnel ingress’inde hostname yoktur veya A record yanlış IP’ye gider.
+1. Zero Trust → Public Hostname: `wa.octotech.az` → `http://hubminimalwp:3000`
+2. Stack env: `TUNNEL_TOKEN=…`
+3. `docker compose --profile tunnel up -d`
+4. DNS: `wa` → tunnel CNAME (hostname tunnel config’te görünmeli)
 
 ## Docker / Portainer
 
 ```bash
 # Ön koşullar (sunucu):
-#   - network: edge (yoksa compose oluşturur)
-#   - traefik (entrypoint: web) — aynı edge ağında olmalı
+#   - network: edge
+#   - traefik entrypoint: websecure (443 + TLS) — aynı edge ağında
 #   - /datastore/hubminimal/data
-#   - DNS: hubmsg.octotech.az → sunucu IP (proxied A, Tunnel DEĞİL)
+#   - DNS: wa.octotech.az → sunucu IP (proxied A)
 ```
 
-1. Repo'yu GitHub'a itin: `https://github.com/aliyabuz25/HubMSG-Mini.git`
+1. Repo: `https://github.com/aliyabuz25/HubMSG-Mini.git`
 2. Portainer → **Stacks → Add stack → Repository**
    - Web URL: `https://github.com/aliyabuz25/HubMSG-Mini.git`
    - Compose path: `docker-compose.yml`
    - Stack name: `hubminimalwp`
 3. Deploy
 
-Compose, Traefik ile `Host(hubmsg.octotech.az)` üzerinden 3000 portuna yönlendirir (eventrentlast ile aynı `edge` + `web` pattern).
+Compose, Traefik **443 (websecure)** üzerinde `Host(wa.octotech.az)` → container `:3000`.
 
 ## Yapı
 
@@ -124,7 +107,7 @@ Compose, Traefik ile `Host(hubmsg.octotech.az)` üzerinden 3000 portuna yönlend
 ├── sessions.js          # Baileys slot yönetimi (max 3)
 ├── public/index.html    # Admin panel (sidebar)
 ├── Dockerfile
-├── docker-compose.yml   # Portainer + Traefik (+ optional tunnel)
+├── docker-compose.yml   # Portainer + Traefik websecure + optional tunnel
 ├── .env.example
 └── portainer-template.json
 ```

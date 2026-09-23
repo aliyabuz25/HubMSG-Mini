@@ -3,7 +3,7 @@
   "templates": [
     {
       "title": "HubMinimalWp",
-      "description": "WhatsApp hub - 3 numara, QR, mesaj API → hubmsg.octotech.az",
+      "description": "WhatsApp hub - 3 numara, QR, mesaj API → wa.octotech.az (Traefik :443)",
       "platform": "docker",
       "image": "hubminimalwp:latest",
       "build": ".",

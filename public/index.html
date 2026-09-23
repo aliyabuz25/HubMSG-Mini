@@ -336,7 +336,7 @@ X-API-Key: (API_KEY)</pre>
     <section class="page" id="page-portainer">
       <div class="page-head">
         <h2>Portainer / Traefik</h2>
-        <p>GitHub'dan Portainer stack → https://hubmsg.octotech.az (edge + traefik)</p>
+        <p>GitHub'dan Portainer stack → https://wa.octotech.az (edge + traefik :443)</p>
       </div>
       <div class="card" style="max-width: 760px;">
         <div class="card-header">Deploy</div>
@@ -348,21 +348,18 @@ X-API-Key: (API_KEY)</pre>
 #
 # Ön koşullar:
 #   - network: edge (yoksa compose oluşturur)
-#   - traefik (entrypoint: web) — aynı edge ağında
+#   - traefik entrypoint: websecure (443 + TLS) — edge ağında
 #   - /datastore/hubminimal/data
 #
 # Cloudflare DNS (error 1033):
-#   log "hazır" ama 1033 → kayıt Tunnel CNAME
-#   1) hubmsg kaydını sil
-#   2) A: hubmsg → sunucu IP (gri veya turuncu bulut)
-#   3) test: /api/health → {"ok":true}
+#   A: wa → sunucu IP (proxied)
+#   test: /api/health → {"ok":true}
 #
 # Alternatif tunnel:
-#   Zero Trust → hostname hubmsg → http://hubminimalwp:3000
-#   + TUNNEL_TOKEN + compose --profile tunnel
+#   Zero Trust → wa.octotech.az → http://hubminimalwp:3000
+#   + TUNNEL_TOKEN + --profile tunnel
 #
-# Deploy → https://hubmsg.octotech.az
-# Test:   /api/health → {"ok":true}</pre>
+# Deploy → https://wa.octotech.az</pre>
         </div>
       </div>
     </section>
