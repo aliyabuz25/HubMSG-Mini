@@ -10,7 +10,7 @@ Minimal WhatsApp hub — Baileys + Bootstrap admin panel. En fazla **3 numara**,
 - QR ile oturum ekleme / silme
 - Metin, medya (URL) ve toplu gönderim
 - Light flat Bootstrap UI + sidebar
-- Traefik `edge` network + **websecure :443** (`Host(wa.octotech.az)`)
+- Traefik `edge` network + **entrypoints=web** (`Host(wa.octotech.az)`) — erent ile aynı
 - Opsiyonel `API_KEY` koruması
 - Opsiyonel Cloudflare Tunnel (`--profile tunnel`)
 

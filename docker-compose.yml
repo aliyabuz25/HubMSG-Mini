@@ -1,8 +1,7 @@
 services:
   hubminimalwp:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
+    container_name: HubMinimalWp
     restart: unless-stopped
     environment:
       PORT: "3000"
@@ -15,24 +14,9 @@ services:
       - 'traefik.enable=true'
       - 'traefik.docker.network=edge'
       - 'traefik.http.routers.wa.rule=Host(`wa.octotech.az`)'
-      - 'traefik.http.routers.wa.entrypoints=websecure'
-      - 'traefik.http.routers.wa.tls=true'
+      - 'traefik.http.routers.wa.entrypoints=web'
       - 'traefik.http.routers.wa.priority=100'
-      - 'traefik.http.routers.wa.service=wa'
-      - 'traefik.http.routers.wa80.rule=Host(`wa.octotech.az`)'
-      - 'traefik.http.routers.wa80.entrypoints=web'
-      - 'traefik.http.routers.wa80.priority=90'
-      - 'traefik.http.routers.wa80.service=wa'
       - 'traefik.http.services.wa.loadbalancer.server.port=3000'
-      - 'traefik.http.services.wa.loadbalancer.healthcheck.path=/api/health'
-      - 'traefik.http.services.wa.loadbalancer.healthcheck.interval=30s'
-      - 'traefik.http.services.wa.loadbalancer.healthcheck.timeout=5s'
-    healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/health']
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
 
 networks:
   edge:
