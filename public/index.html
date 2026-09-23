@@ -351,9 +351,11 @@ X-API-Key: (API_KEY)</pre>
 #   - traefik (entrypoint: web) — aynı edge ağında
 #   - /datastore/hubminimal/data
 #
-# Cloudflare DNS (error 1033 ise):
-#   Tunnel CNAME kaydını sil
-#   → proxied A: hubmsg → sunucu IP
+# Cloudflare DNS (error 1033):
+#   log "hazır" ama 1033 → kayıt Tunnel CNAME
+#   1) hubmsg kaydını sil
+#   2) A: hubmsg → sunucu IP (gri veya turuncu bulut)
+#   3) test: /api/health → {"ok":true}
 #
 # Alternatif tunnel:
 #   Zero Trust → hostname hubmsg → http://hubminimalwp:3000

@@ -60,24 +60,42 @@ curl -X POST http://localhost:3000/api/send/media \
 Production: `https://hubmsg.octotech.az/api/health`  
 `API_KEY` tanımlıysa header: `X-API-Key: <key>`
 
-## Cloudflare DNS (error 1033 düzeltme)
+## Cloudflare DNS (error 1033)
 
-`hubmsg.octotech.az` **error 1033** veriyorsa kayıt **Tunnel (CNAME)** yapılmış; tunnel ingress'inde hostname yoktur.
+**Belirti:** Portainer log’u `HubMinimalWp hazır: http://0.0.0.0:3000` ama tarayıcıda **Error 1033 / Cloudflare Tunnel error**.
 
-**Doğru (Traefik — önerilen):**
+Uygulama ve Traefik doğru; kayıt **Cloudflare Tunnel (CNAME)** — edge, hostname’i bu tunnel’da çözemediğinden 1033 döner.
 
-1. Cloudflare → DNS → `hubmsg` kaydını **sil**
-2. **A** kaydı ekle: name `hubmsg`, value **sunucu IP** (eventrentlast ile aynı origin), **Proxy: ON (bulut)**
-3. Traefik `entrypoints=web` ile Host routing zaten compose'ta
-4. Portainer stack'i deploy et → https://hubmsg.octotech.az
+### Seçenek A — Traefik (eventrentlast gibi, önerilen)
 
-**Alternatif (Cloudflare Tunnel):**
+1. Cloudflare → **DNS** → `hubmsg` kaydını **Delete**
+2. **Add record:**
+   - Type: **A**
+   - Name: **hubmsg**
+   - IPv4: **sunucu public IP** (Portainer/Traefik’in olduğu makine)
+   - Proxy: **DNS only (gri bulut)** dene; olmazsa **Proxied (turuncu)**
+3. 1–2 dk bekle → `https://hubmsg.octotech.az/api/health`
 
-1. Zero Trust → Networks → Tunnels → Public Hostname:
-   - `hubmsg.octotech.az` → `http://hubminimalwp:3000`
-2. Stack'e `TUNNEL_TOKEN` ekle
-3. Deploy: compose profile `tunnel` ile cloudflared ayağa kalkar
-4. DNS: Tunnel CNAME kaydı (hostname tunnel config'te görünmeli)
+> Compose zaten `Host(hubmsg.octotech.az)` + `entrypoints=web` tanımlı (commit `0ca1957`). Origin’e giden tek eksik DNS.
+
+### Seçenek B — Cloudflare Tunnel
+
+1. Zero Trust → **Networks → Tunnels** → aktif tunnel → **Public Hostname → Add**
+   - `hubmsg.octotech.az` → `http://hubminimalwp:3000`  
+     (hubminimalwp compose ile aynı `edge` ağında olmalı)
+2. Stack env: `TUNNEL_TOKEN=<tunnel token>`
+3. Deploy: `docker compose --profile tunnel up -d`  
+   veya Portainer’da stack’i bu profile ile başlat
+4. DNS: `hubmsg` tunnel CNAME kaydı kalsın
+
+### Doğrulama
+
+```bash
+curl -s https://hubmsg.octotech.az/api/health
+# {"ok":true,"maxSlots":3}
+```
+
+1033 sürerse: tunnel ingress’inde hostname yoktur veya A record yanlış IP’ye gider.
 
 ## Docker / Portainer
 
