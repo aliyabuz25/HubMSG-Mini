@@ -95,7 +95,9 @@ Eski `hubmsg.octotech.az` kullanıyorsan aynı adımlar: A kaydı `hubmsg` → s
    - Web URL: `https://github.com/aliyabuz25/HubMSG-Mini.git`
    - Compose path: `docker-compose.yml`
    - Stack name: `hubminimalwp`
-3. Deploy
+   - **Pull latest images: OFF** (image registry’de yok; compose `build: .` kullanır)
+3. Deploy (Portainer Dockerfile’ı build eder)
+4. Redeploy’da da pull kapalı kalsın — yoksa `pull access denied for hubminimalwp`
 
 Compose, Traefik **443 (websecure)** üzerinde `Host(wa.octotech.az)` → container `:3000`.
 

@@ -5,9 +5,12 @@
       "title": "HubMinimalWp",
       "description": "WhatsApp hub - 3 numara, QR, mesaj API → wa.octotech.az (Traefik :443)",
       "platform": "docker",
-      "image": "hubminimalwp:latest",
-      "build": ".",
       "categories": ["misc"],
+      "build": {
+        "repository": "https://github.com/aliyabuz25/HubMSG-Mini.git",
+        "path": ".",
+        "dockerfile": "Dockerfile"
+      },
       "ports": [],
       "env": [
         {
