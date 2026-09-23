@@ -84,8 +84,8 @@ Eski `hubmsg.octotech.az` kullanıyorsan aynı adımlar: A kaydı `hubmsg` → s
 
 ```bash
 # Ön koşullar (sunucu):
-#   - network: edge
-#   - traefik entrypoint: websecure (443 + TLS) — aynı edge ağında
+#   - network: edge (external — mevcut olmalı, compose oluşturmaz)
+#   - traefik entrypoint: websecure (443) — edge ağında
 #   - /datastore/hubminimal/data
 #   - DNS: wa.octotech.az → sunucu IP (proxied A)
 ```
