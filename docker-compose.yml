@@ -18,6 +18,8 @@ services:
       - 'traefik.http.routers.hubmsg.entrypoints=web'
       - 'traefik.http.services.hubmsg.loadbalancer.server.port=3000'
 
+# Yoksa oluşturur; varsa mevcut edge ağına bağlanır
 networks:
   edge:
-    external: true
+    name: edge
+    driver: bridge
