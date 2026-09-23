@@ -80,6 +80,22 @@ Eski `hubmsg.octotech.az` kullanıyorsan aynı adımlar: A kaydı `hubmsg` → s
 3. `docker compose --profile tunnel up -d`
 4. DNS: `wa` → tunnel CNAME (hostname tunnel config’te görünmeli)
 
+## 404 page not found
+
+Traefik/cloudflared Host eşleşmiyor. Kontrol:
+
+1. Stack redeploy (labels için)
+2. İstek Host = **`wa.octotech.az`** (hubmsg değil)
+3. Origin’i dene: `curl -H 'Host: wa.octotech.az' http://SUNUCU_IP/` ve `https://…`
+4. DNS: **A `wa` → sunucu IP** (Tunnel CNAME ise 1033/404 olur)
+5. Tunnel kullanıyorsan Zero Trust hostname birebir `wa.octotech.az` olmalı
+6. Traefik `web` (:80) **veya** `websecure` (:443) açık olmalı — compose her ikisini de dener
+
+```bash
+curl -s https://wa.octotech.az/api/health
+# {"ok":true,"maxSlots":3}
+```
+
 ## Docker / Portainer
 
 ```bash

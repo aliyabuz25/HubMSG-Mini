@@ -15,8 +15,14 @@ services:
       - 'traefik.docker.network=edge'
       - 'traefik.http.routers.wa.rule=Host(`wa.octotech.az`)'
       - 'traefik.http.routers.wa.entrypoints=websecure'
+      - 'traefik.http.routers.wa.tls=true'
       - 'traefik.http.routers.wa.priority=100'
+      - 'traefik.http.routers.wa.service=wa'
       - 'traefik.http.services.wa.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.wa80.rule=Host(`wa.octotech.az`)'
+      - 'traefik.http.routers.wa80.entrypoints=web'
+      - 'traefik.http.routers.wa80.priority=90'
+      - 'traefik.http.routers.wa80.service=wa'
 
 networks:
   edge:
