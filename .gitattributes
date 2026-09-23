@@ -1,0 +1,7 @@
+# GitHub language stats — Node/JS projesi olarak göster
+*.html linguist-detectable=false
+public/** linguist-documentation
+package-lock.json linguist-generated=true
+Dockerfile linguist-detectable=false
+*.yml linguist-detectable=false
+*.json linguist-detectable=false
