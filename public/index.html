@@ -346,9 +346,9 @@ X-API-Key: (API_KEY)</pre>
 # Compose path: docker-compose.yml
 # Stack name:   hubminimalwp
 #
-# Ön koşullar (sunucuda hazır olmalı):
-#   - external network: edge
-#   - traefik (entrypoint: web)
+# Ön koşullar:
+#   - network: edge (yoksa compose oluşturur)
+#   - traefik (entrypoint: web) — aynı edge ağında
 #   - /datastore/hubminimal/data
 #
 # Cloudflare DNS:

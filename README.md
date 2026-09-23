@@ -62,8 +62,8 @@ curl -X POST http://localhost:3000/api/send/media \
 
 ```bash
 # Ön koşullar (sunucu):
-#   - external network: edge
-#   - traefik (entrypoint: web)
+#   - network: edge (yoksa compose oluşturur)
+#   - traefik (entrypoint: web) — aynı edge ağında olmalı
 #   - /datastore/hubminimal/data
 #   - DNS: hubmsg.octotech.az → sunucu IP
 ```
